@@ -1,0 +1,33 @@
+esphome:
+  name: doorbell
+  platform: ESP8266
+  board: d1_mini # the actual device you have, used for pin mapping.
+
+# wifi details in here
+<<: !include ./secrets.yaml
+
+# this says if wifi is lost make an AP with a web page to add new wifi details
+captive_portal:
+
+# this means enable homeassistnat API
+api:
+
+# this is for the internal LED
+output:
+  - platform: gpio
+    pin: D4
+    id: gpio_d4
+
+# this is exposed to home assistant D0/GPIO16 is connected to the logic chip
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D0
+      mode: INPUT_PULLDOWN_16
+    name: "doorbell_press"
+    on_release:
+      then:
+        - output.turn_on: gpio_d4
+    on_press:
+      then:
+        - output.turn_off: gpio_d4
